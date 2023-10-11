@@ -45,7 +45,7 @@ class Spot{
 function getSpots(){
   let spotsResult;
   var xhttp = new XMLHttpRequest();
-  xhttp.open("GET", "https://cors-anywhere.herokuapp.com/https://dotted-weaver-401511.ew.r.appspot.com/spots" );
+  xhttp.open("GET", "https://dotted-weaver-401511.ew.r.appspot.com/spots" );
   xhttp.onreadystatechange = function() {
     console.log('ApiCall')
     if (this.readyState == 4 && this.status == 200) {
@@ -188,7 +188,7 @@ function postSpotAPI(spot){
   var body = JSON.stringify(spot);
   console.log(body);
   var xhttp = new XMLHttpRequest();
-  xhttp.open("POST", "https://cors-anywhere.herokuapp.com/https://dotted-weaver-401511.ew.r.appspot.com/spots" );
+  xhttp.open("POST", "https://dotted-weaver-401511.ew.r.appspot.com/spots" );
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       console.log('Spot inserted')
@@ -204,7 +204,7 @@ map.on('click', function (evt) {
     let lastId;
     let newIcon;
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "https://cors-anywhere.herokuapp.com/https://dotted-weaver-401511.ew.r.appspot.com/spots/last" );
+    xhttp.open("GET", "https://dotted-weaver-401511.ew.r.appspot.com/spots/last" );
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         lastId = JSON.parse(this.responseText)[0]["MAX(ID)"];
@@ -236,7 +236,7 @@ modify.on(['modifyend'], function (evt) {
   let spot = new Spot(modId, coordinate);
   let body = spot.getSpotDict();
   var xhttp = new XMLHttpRequest();
-  xhttp.open("PUT", "https://cors-anywhere.herokuapp.com/https://dotted-weaver-401511.ew.r.appspot.com/spots" );
+  xhttp.open("PUT", "https://dotted-weaver-401511.ew.r.appspot.com/spots" );
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         console.log(modId+" new position "+coordinate)
@@ -270,7 +270,7 @@ modify.on(['modifyend'], function (evt) {
     if(id >=0){
 
       var xhttp = new XMLHttpRequest();
-      xhttp.open("DELETE", "https://cors-anywhere.herokuapp.com/https://dotted-weaver-401511.ew.r.appspot.com/spots/"+id );
+      xhttp.open("DELETE", "https://dotted-weaver-401511.ew.r.appspot.com/spots/"+id );
       xhttp.onreadystatechange = function() {
         if(this.status == 200 && this.readyState == 4){
           console.log('delete'+ selectedPoint);
