@@ -1,6 +1,6 @@
 export default {
   build: {
     sourcemap: true,
-    base: solardrone-front
+    base: 'solardrone-front'
   }
 }
