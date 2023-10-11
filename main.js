@@ -119,7 +119,7 @@ const markerStyle = new Style({
     anchor: [0.5, 1],
     anchorXUnits: 'fraction',
     anchorYUnits: 'fraction',
-    src: '/Images/Map_pin_icon.png',
+    src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Map_pin_icon.svg/352px-Map_pin_icon.svg.png',
     scale: 0.02
   }),
 });
