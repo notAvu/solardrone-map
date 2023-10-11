@@ -15,6 +15,7 @@ import { Icon, Style } from 'ol/style.js';
 import { Vector as VectorSource } from 'ol/source.js';
 import { Vector as VectorLayer } from 'ol/layer.js';
 import {Modify} from 'ol/interaction.js';
+
 class Spot{
   constructor(id, coordinates ,label=""){
       this.id= id;
@@ -27,6 +28,7 @@ class Spot{
   getId(){
       return this.id;
   }
+  /**Generates a dictionary with the data of a spot in the format the API needs it */
   getSpotDict(){
     var dict = {
       'CoordX' : this.coordinates[0],
@@ -37,6 +39,9 @@ class Spot{
     return dict;
 }
 } 
+/**
+ * Executes a call to the spots API to get all the spots stored and load them into the map
+ */
 function getSpots(){
   let spotsResult;
   var xhttp = new XMLHttpRequest();
@@ -82,6 +87,9 @@ function epsg4326toEpsg3857(coordinates) {
   return [x, y];
 }
 var spotList;
+/**
+ * Auxiliary function that generates spots on the map given a list with their data
+ */
 function loadSpots(list){
   spotList = list
   console.log(spotList[0])
@@ -143,6 +151,8 @@ function disposePopover() {
     popover = undefined;
   }
 }
+let selectedPointId;
+let selectedPoint; 
 map.on('click', function (evt) {
   const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
     return feature;
@@ -151,7 +161,11 @@ map.on('click', function (evt) {
   if (feature) {
     if(popupElement.style.display == 'none'){
       popupElement.style.display = "block";
+      //TODO: enable delete button
     }
+    console.log(feature.values_.name);
+    selectedPointId = feature.values_.name;
+    selectedPoint = feature;
     popup.setPosition(evt.coordinate);
     // var fixedCoord = epsg3857toEpsg4326(evt.coordinate)
     var fixedCoord = evt.coordinate
@@ -167,6 +181,9 @@ map.on('click', function (evt) {
 map.addOverlay(popup);
 map.on('movestart', disposePopover);
 
+/**
+ * A function that sends a given spot's data to the API 
+ */
 function postSpotAPI(spot){
   var body = JSON.stringify(spot);
   console.log(body);
@@ -203,10 +220,7 @@ map.on('click', function (evt) {
       }
     };
     console.log(newIcon)
-  // xhttp.setRequestHeader("Content-type", "application/json"); 
-  xhttp.send();
-
-    
+    xhttp.send();
     addButtonActive = false;
   }
 });
@@ -215,37 +229,61 @@ const modify = new Modify({
   hitDetection: vectorLayer,
   source: vectorSource,
 });
-modify.on(['modifystart', 'modifyend'], function (evt) {
-  // evt.target.style.cursor = evt.type === 'modifystart' ? 'grabbing' : 'pointer';
-  console.log(evt.target);
+modify.on(['modifyend'], function (evt) {
+  var feature = evt.features.array_['0'];
+  let modId = feature.values_.name
+  let coordinate = evt.features.getArray()[0].geometryChangeKey_.target.flatCoordinates;
+  let spot = new Spot(modId, coordinate);
+  let body = spot.getSpotDict();
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("PUT", "https://cors-anywhere.herokuapp.com/https://dotted-weaver-401511.ew.r.appspot.com/spots" );
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        console.log(modId+" new position "+coordinate)
+      }else{
+        console.log('error'+this.status);
+      }
+    };
+    xhttp.setRequestHeader("Content-type", "application/json"); 
+    xhttp.send(JSON.stringify(body));
 });
-// const overlaySource = modify.getOverlay().getSource();
-// overlaySource.on(['addfeature', 'removefeature'], function (evt) {
-  //   // evt.target.style.cursor = evt.type === 'addfeature' ? 'pointer' : '';
-  // });
+
   map.addInteraction(modify);
   
-  // const centerButton = document.getElementById('setCenter');
   const closeButton = document.getElementById('close-button');
   closeButton.addEventListener('click', closePopover);
-  const addPointButton = document.getElementById('addPoint');
+  const deleteButton = document.getElementById('deleteButton');
+  deleteButton.addEventListener('click', deleteSpot);
   const uploadButton = document.getElementById('uploadFile');
   uploadButton.addEventListener('change', addGeotiffLayer);
+  const addPointButton = document.getElementById('addPoint');
   addPointButton.addEventListener('click', addButtonClick);
-  // centerButton.addEventListener("click", setCenter);
+  
   function closePopover(){
-    
     popupElement.style.display = 'none';
-    
   }
   var addButtonActive = false;
-  function setCenter() {
-    // const point = rgbSource.getTileGrid().getOrigin();  
-    // const size = map.getSize();
-    // map.getView().setZoom(17);
-    // map.getView().centerOn(point, size, [570, 500]);
+
+  //Deletes the point whose popover is currently being shown
+  function deleteSpot(){
+    let id = selectedPointId;
+    if(id >=0){
+
+      var xhttp = new XMLHttpRequest();
+      xhttp.open("DELETE", "https://cors-anywhere.herokuapp.com/https://dotted-weaver-401511.ew.r.appspot.com/spots/"+id );
+      xhttp.onreadystatechange = function() {
+        if(this.status == 200 && this.readyState == 4){
+          console.log('delete'+ selectedPoint);
+          vectorLayer.getSource().removeFeature(selectedPoint);
+        }
+      };
+      xhttp.setRequestHeader("Content-type", "application/json"); 
+      xhttp.send();
+    }
   }
-  
+  /**
+   * Generates a new layer in which the uploaded geotiff file will be projected
+   */
   function addGeotiffLayer() {
     var geotiffFile = uploadButton.files[0];
     var fileUrl = URL.createObjectURL(geotiffFile);
@@ -264,10 +302,6 @@ modify.on(['modifystart', 'modifyend'], function (evt) {
       geotiffLayer = new TileLayer({ source: geotiffSource, });
       map.getLayers().insertAt(1, geotiffLayer);
     });
-    // var center = geotiffLayer.getSources().getTileGrid().getOrigin();  
-    // var mapSize = map.getSize();
-    // map.getView().setZoom(17);
-    // map.getView().centerOn(center, mapSize, [570, 500]);
   }
   function addButtonClick() {
     addButtonActive = true;
