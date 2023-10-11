@@ -10,6 +10,8 @@
     "vite": "^4.0.4"
   },
   "dependencies": {
-    "ol": "latest"
+    "ol": "latest",
+    "type": "module"
   }
+  
 }
