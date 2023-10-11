@@ -1,20 +1,20 @@
 import './style.css';
-import GeoTIFF from './ol/source/GeoTIFF.js';
-import Map from './ol/Map.js';
-import OSM from './ol/source/OSM.js';
-import Overlay from './ol/Overlay.js';
-import Projection from './ol/proj/Projection.js';
-import MousePosition from './ol/control/MousePosition.js';
-import { createStringXY } from './ol/coordinate.js';
-import { defaults as defaultControls } from './ol/control.js';
-import TileLayer from './ol/layer/WebGLTile.js';
-import View from './ol/View.js';
-import Point from './ol/geom/Point.js';
-import Feature from './ol/Feature.js';
-import { Icon, Style } from './ol/style.js';
-import { Vector as VectorSource } from './ol/source.js';
-import { Vector as VectorLayer } from './ol/layer.js';
-import {Modify} from './ol/interaction.js';
+import GeoTIFF from 'ol/source/GeoTIFF.js';
+import Map from 'ol/Map.js';
+import OSM from 'ol/source/OSM.js';
+import Overlay from 'ol/Overlay.js';
+import Projection from 'ol/proj/Projection.js';
+import MousePosition from 'ol/control/MousePosition.js';
+import { createStringXY } from 'ol/coordinate.js';
+import { defaults as defaultControls } from 'ol/control.js';
+import TileLayer from 'ol/layer/WebGLTile.js';
+import View from 'ol/View.js';
+import Point from 'ol/geom/Point.js';
+import Feature from 'ol/Feature.js';
+import { Icon, Style } from 'ol/style.js';
+import { Vector as VectorSource } from 'ol/source.js';
+import { Vector as VectorLayer } from 'ol/layer.js';
+import {Modify} from 'ol/interaction.js';
 
 class Spot{
   constructor(id, coordinates ,label=""){
